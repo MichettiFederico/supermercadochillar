@@ -628,6 +628,30 @@
 
   const $ = (id) => document.getElementById(id);
 
+  // Convierte automáticamente links de Google Drive a formato de imagen directa
+  function parseImageUrl(url) {
+    if (!url) return "";
+    let fileId = "";
+    
+    // Si contiene /file/d/ID/
+    const matchFile = url.match(/\/file\/d\/([a-zA-Z0-9_-]+)/);
+    if (matchFile && matchFile[1]) {
+      fileId = matchFile[1];
+    } else {
+      // Si contiene ?id=ID o &id=ID
+      const matchParam = url.match(/[?&]id=([a-zA-Z0-9_-]+)/);
+      if (matchParam && matchParam[1]) {
+        fileId = matchParam[1];
+      }
+    }
+
+    if (fileId) {
+      return `https://lh3.googleusercontent.com/d/${fileId}`;
+    }
+
+    return url;
+  }
+
   async function fetchProducts(){
     try {
       const res = await fetch(SHEET_URL + `&t=${Date.now()}`);
@@ -651,7 +675,9 @@
         const valName = String(getVal(0)).trim();     // Columna A: Nombre
         const valCat = String(getVal(1)).trim();      // Columna B: Categoría
         const valPrice = parseFloat(getVal(2)) || 0;  // Columna C: Precio
-        const valImg = String(getVal(3)).trim();      // Columna D: Imagen (Opcional)
+        let valImg = String(getVal(3)).trim();        // Columna D: Imagen
+
+        valImg = parseImageUrl(valImg);
 
         // Saltear fila de encabezados si dice "Nombre" o "Producto"
         if (idx === 0 && (valName.toLowerCase() === "nombre" || valName.toLowerCase() === "producto")) {
@@ -755,7 +781,7 @@
         <div>
           <div class="img-wrapper">
             ${p.image
-              ? `<img class="product-img" src="${p.image}" alt="${escapeHtml(p.name)}" loading="lazy">`
+              ? `<img class="product-img" src="${p.image}" alt="${escapeHtml(p.name)}" loading="lazy" onerror="this.onerror=null; this.parentElement.innerHTML='<div class=\\'img-placeholder\\'>Sin foto</div>';">`
               : `<div class="img-placeholder">Sin foto</div>`}
           </div>
           <span class="product-cat">${escapeHtml(p.category || "General")}</span>
