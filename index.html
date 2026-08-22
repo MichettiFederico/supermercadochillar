@@ -42,7 +42,6 @@
     -webkit-font-smoothing: antialiased;
   }
 
-  /* Header principal */
   header.hero {
     background: linear-gradient(135deg, var(--pine) 0%, #11241b 100%);
     color: #fff;
@@ -101,7 +100,6 @@
     font-weight: 400;
   }
 
-  /* Barra de herramientas flotante/sticky */
   .sticky-toolbar {
     position: sticky;
     top: 12px;
@@ -171,7 +169,6 @@
     outline: none;
   }
 
-  /* Categorías / Tabs */
   .tabs-container {
     max-width: 1080px;
     margin: 0 auto 24px;
@@ -206,7 +203,6 @@
     box-shadow: 0 4px 12px rgba(27,56,43,0.2);
   }
 
-  /* Layout Principal */
   main {
     max-width: 1080px;
     margin: 0 auto;
@@ -223,7 +219,6 @@
     font-weight: 500;
   }
 
-  /* Grid de Productos */
   .grid-products {
     display: grid;
     grid-template-columns: repeat(auto-fill, minmax(210px, 1fr));
@@ -341,7 +336,6 @@
     transform: scale(1.1);
   }
 
-  /* Estado vacío / Skeleton */
   .empty-state {
     text-align: center;
     padding: 60px 20px;
@@ -354,7 +348,6 @@
   .empty-state h3 { font-size: 1.2rem; margin-bottom: 6px; color: var(--ink); }
   .empty-state p { color: var(--ink-muted); font-size: 0.9rem; }
 
-  /* Barra flotante de Mi Lista (Carrito) */
   .floating-cart-bar {
     position: fixed;
     bottom: 20px;
@@ -406,14 +399,12 @@
 
   .btn-open-list:hover { background: #fff; }
 
-  /* Modal de Lista */
   .modal-overlay {
     position: fixed;
     inset: 0;
     background: rgba(0,0,0,0.5);
     backdrop-filter: blur(4px);
     z-index: 200;
-    display: opacity;
     opacity: 0;
     pointer-events: none;
     transition: opacity 0.2s ease;
@@ -589,7 +580,6 @@
   </div>
 </main>
 
-<!-- Barra flotante "Mi Lista de Compras" -->
 <div class="floating-cart-bar" id="cartBar">
   <div class="cart-info">
     <span class="cart-count-badge" id="cartBadge">0</span>
@@ -601,7 +591,6 @@
   <button class="btn-open-list" id="btnOpenList">Ver mi lista ➔</button>
 </div>
 
-<!-- Modal Mi Lista -->
 <div class="modal-overlay" id="modalOverlay">
   <div class="modal-card">
     <div class="modal-header">
@@ -627,12 +616,8 @@
 (function(){
   "use strict";
 
-  const config = {
-    owner: "TU-USUARIO-DE-GITHUB",
-    repo: "TU-REPOSITORIO",
-    branch: "main",
-    dataFile: "productos.json"
-  };
+  const SHEET_ID = "1awLuLCY-BCqjmEW5EEH1nx7oTYRMBhcTN5HtoeZtWCI";
+  const SHEET_URL = `https://docs.google.com/spreadsheets/d/${SHEET_ID}/gviz/tq?tqx=out:json`;
   const REFRESH_SECONDS = 60;
 
   let products = [];
@@ -643,18 +628,52 @@
 
   const $ = (id) => document.getElementById(id);
 
-  function rawUrl(){
-    return `https://raw.githubusercontent.com/${config.owner}/${config.repo}/${config.branch}/${config.dataFile}`;
-  }
-
   async function fetchProducts(){
     try {
-      const res = await fetch(rawUrl() + `?t=${Date.now()}`);
-      if(res.ok){
-        products = await res.json();
-        $("updatedAt").textContent = "Act. " + new Date().toLocaleTimeString("es-AR", {hour:"2-digit", minute:"2-digit"});
-      }
-    } catch(e) { }
+      const res = await fetch(SHEET_URL + `&t=${Date.now()}`);
+      if (!res.ok) throw new Error("HTTP " + res.status);
+      const text = await res.text();
+
+      const jsonMatch = text.match(/google\.visualization\.Query\.setResponse\(([\s\S]*)\);/);
+      if (!jsonMatch) throw new Error("Formato de Google Sheet no válido");
+
+      const data = JSON.parse(jsonMatch[1]);
+      const rows = data.table.rows || [];
+
+      const parsedProducts = [];
+
+      rows.forEach((r, idx) => {
+        const cells = r.c;
+        if (!cells) return;
+
+        const getVal = (i) => (cells[i] && cells[i].v !== null && cells[i].v !== undefined) ? cells[i].v : "";
+
+        const valName = String(getVal(0)).trim();     // Columna A: Nombre
+        const valCat = String(getVal(1)).trim();      // Columna B: Categoría
+        const valPrice = parseFloat(getVal(2)) || 0;  // Columna C: Precio
+        const valImg = String(getVal(3)).trim();      // Columna D: Imagen (Opcional)
+
+        // Saltear fila de encabezados si dice "Nombre" o "Producto"
+        if (idx === 0 && (valName.toLowerCase() === "nombre" || valName.toLowerCase() === "producto")) {
+          return;
+        }
+
+        if (valName) {
+          parsedProducts.push({
+            id: valName,
+            name: valName,
+            category: valCat || "General",
+            price: valPrice,
+            image: valImg
+          });
+        }
+      });
+
+      products = parsedProducts;
+      $("updatedAt").textContent = "Act. " + new Date().toLocaleTimeString("es-AR", {hour:"2-digit", minute:"2-digit"});
+    } catch(e) {
+      console.error("Error al cargar la planilla de Google Sheets:", e);
+    }
     render();
   }
 
@@ -729,7 +748,7 @@
     }
 
     $("emptyState").style.display = "none";
-    grid.innerHTML = list.map((p, idx) => {
+    grid.innerHTML = list.map((p) => {
       const pId = p.id || p.name;
       return `
       <div class="product-card">
@@ -754,6 +773,8 @@
         addToCart(btn.dataset.id);
       });
     });
+
+    updateCartUI();
   }
 
   function updateCartUI(){
@@ -800,7 +821,6 @@
     }
   }
 
-  // Event Listeners
   $("searchInput").addEventListener("input", (e) => {
     searchQuery = e.target.value;
     render();
@@ -828,4 +848,3 @@
 </script>
 </body>
 </html>
-
