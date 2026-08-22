@@ -800,7 +800,7 @@
       <span>✨</span> ¡Buenos días!
     </div>
     <h1 class="hero-title" id="heroGreetingTitle">Lo mejor para tu mesa,<br>fresco y al instante.</h1>
-    <p class="hero-subtitle">Precios de góndola actualizados en vivo. Armá tu lista y retirá en el local o te lo enviamos.</p>
+    <p class="hero-subtitle">Precios de góndola actualizados en vivo. Armá tu lista de compras y retirá por el local.</p>
   </div>
 </div>
 
@@ -848,7 +848,7 @@
       <button class="btn-close-drawer" id="btnCloseDrawer">✕</button>
     </div>
     <div class="free-shipping-bar">
-      <div id="shippingText">Agregá $5.000 más para Beneficio Especial</div>
+      <div id="shippingText">Agregá $15.000 más para un Descuento Especial</div>
       <div class="progress-bg"><div class="progress-fill" id="shippingProgress"></div></div>
     </div>
     <div class="drawer-body" id="cartDrawerItems"></div>
@@ -876,17 +876,10 @@
       </div>
       <div class="form-group">
         <label class="form-label">Modalidad de Entrega</label>
-        <select id="custDelivery" class="form-input">
-          <option value="Retiro en Local">Retiro en Local (Chillar)</option>
-          <option value="Envío a Domicilio">Envío a Domicilio</option>
-        </select>
+        <input type="text" class="form-input" value="Retiro exclusivo en el local (Supermercado Chillar)" readonly style="background: var(--surface-subtle); color: var(--ink-muted); font-weight: 600; cursor: not-allowed;">
       </div>
       <div class="form-group">
-        <label class="form-label">Dirección (Si aplica)</label>
-        <input type="text" id="custAddress" class="form-input" placeholder="Calle y número">
-      </div>
-      <div class="form-group">
-        <label class="form-label">Método de Pago Preferido</label>
+        <label class="form-label">Método de Pago Preferido en Caja</label>
         <select id="custPayment" class="form-input">
           <option value="Efectivo en Entrega">Efectivo</option>
           <option value="Transferencia / Mercado Pago">Transferencia / Mercado Pago</option>
@@ -956,13 +949,18 @@
           const getV = idx => r.c[idx] ? r.c[idx].v : "";
           const name = String(getV(0)).trim();
           if (!name || (i === 0 && name.toLowerCase().includes("nombre"))) return null;
+
+          // Columna E (index 4) para ofertas (ej: "si", "sí", "yes")
+          const promoRaw = String(getV(4)).trim().toLowerCase();
+          const isPromo = promoRaw === "si" || promoRaw === "sí" || promoRaw === "yes";
+
           return {
             id: name,
             name: name,
             category: String(getV(1)).trim() || "General",
             price: parseFloat(getV(2)) || 0,
             image: parseImageUrl(String(getV(3)).trim()),
-            isPromo: i % 4 === 0
+            isPromo: isPromo
           };
         }).filter(Boolean);
       }
@@ -1109,7 +1107,7 @@
     const target = 15000;
     const pct = Math.min(100, (totalPrice / target) * 100);
     $("shippingProgress").style.width = `${pct}%`;
-    $("shippingText").textContent = pct >= 100 ? "¡Tenés beneficio especial alcanzado!" : `Agregá ${fmt(target - totalPrice)} más para Beneficio Especial`;
+    $("shippingText").textContent = pct >= 100 ? "¡Beneficio Especial alcanzado!" : `Agregá ${fmt(target - totalPrice)} más para Descuento Especial`;
   }
 
   function renderUI() {
@@ -1135,7 +1133,7 @@
 
   $("checkoutForm").onsubmit = (e) => {
     e.preventDefault();
-    alert("¡Pedido registrado con éxito! Muchas gracias por tu compra.");
+    alert("¡Pedido registrado con éxito! Tu orden quedó lista para retirar en el local.");
     cart = {};
     localStorage.removeItem("chillar_cart_v2");
     $("checkoutModal").classList.remove("active");
