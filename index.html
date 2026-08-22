@@ -327,39 +327,6 @@
 
   .active .cat-icon-bubble { background: rgba(255,255,255,0.15); }
 
-  /* SMART BUNDLE / ASISTENTE MODAL BANNERS */
-  .assistant-card {
-    background: linear-gradient(135deg, var(--amber-soft) 0%, #fff 100%);
-    border: 1.5px solid var(--amber-main);
-    border-radius: var(--radius-lg);
-    padding: 18px 24px;
-    margin-bottom: 32px;
-    display: flex;
-    align-items: center;
-    justify-content: space-between;
-    gap: 16px;
-  }
-
-  .assistant-info { display: flex; align-items: center; gap: 14px; }
-  .assistant-icon { font-size: 2rem; }
-  .assistant-title { font-weight: 700; font-size: 1rem; color: var(--ink-main); }
-  .assistant-desc { font-size: 0.85rem; color: var(--ink-muted); }
-
-  .btn-bundle-add {
-    background: var(--amber-main);
-    color: #fff;
-    border: none;
-    padding: 10px 18px;
-    border-radius: var(--radius-full);
-    font-weight: 700;
-    font-size: 0.85rem;
-    cursor: pointer;
-    transition: var(--transition-fast);
-    white-space: nowrap;
-  }
-
-  .btn-bundle-add:hover { background: #b45309; transform: scale(1.03); }
-
   /* PRODUCT GRID & CARDS */
   .products-grid {
     display: grid;
@@ -483,7 +450,6 @@
     margin-top: 4px;
   }
 
-  /* DYNAMIC ADD BUTTON (- 1 +) */
   .action-container {
     margin-top: auto;
   }
@@ -682,7 +648,7 @@
 
   .btn-checkout:hover { background: var(--pine-800); transform: translateY(-1px); }
 
-  /* MOBILE BOTTOM BAR */
+  /* MOBILE BOTTOM NAV */
   .mobile-bottom-nav {
     display: none;
     position: fixed;
@@ -773,6 +739,22 @@
 
   .form-input:focus { border-color: var(--pine-500); }
 
+  .order-summary-box {
+    background: var(--surface-subtle);
+    border-radius: var(--radius-md);
+    padding: 14px;
+    margin-bottom: 16px;
+    font-size: 0.85rem;
+  }
+
+  .order-summary-item {
+    display: flex;
+    justify-content: space-between;
+    margin-bottom: 6px;
+  }
+
+  .order-summary-item:last-child { margin-bottom: 0; }
+
   @media (max-width: 768px) {
     .nav-actions { display: none; }
     .hero-card { padding: 24px 20px; }
@@ -834,18 +816,6 @@
   </div>
   <div class="categories-scroll" id="categoriesContainer"></div>
 
-  <!-- ASISTENTE / COMPRA INTELIGENTE (COMBO DYNAMIC SUGGESTION) -->
-  <div class="assistant-card" id="assistantCard" style="display:none;">
-    <div class="assistant-info">
-      <div class="assistant-icon">🍝</div>
-      <div>
-        <div class="assistant-title">¿Noche de Pastas? Sugerencia de Compra Inteligente</div>
-        <div class="assistant-desc">Agregaste fideos a tu carrito. Sumá la salsa de tomate con un click.</div>
-      </div>
-    </div>
-    <button class="btn-bundle-add" id="btnBundleAdd">＋ Agregar Combo Combo</button>
-  </div>
-
   <!-- SECCIÓN PRODUCTOS DESTACADOS / GRID -->
   <div class="section-header">
     <div class="section-title-group">
@@ -878,7 +848,7 @@
       <button class="btn-close-drawer" id="btnCloseDrawer">✕</button>
     </div>
     <div class="free-shipping-bar">
-      <div id="shippingText">Agregá $5.000 más para Bonificación Especial</div>
+      <div id="shippingText">Agregá $5.000 más para Beneficio Especial</div>
       <div class="progress-bg"><div class="progress-fill" id="shippingProgress"></div></div>
     </div>
     <div class="drawer-body" id="cartDrawerItems"></div>
@@ -887,7 +857,7 @@
         <span>Total estimado</span>
         <span id="drawerTotal" style="color:var(--emerald-accent); font-family:'Space Grotesk'; font-size:1.4rem;">$0</span>
       </div>
-      <button class="btn-checkout" id="btnStartCheckout">Finalizar Pedido por WhatsApp ➔</button>
+      <button class="btn-checkout" id="btnStartCheckout">Finalizar Pedido ➔</button>
     </div>
   </div>
 </div>
@@ -895,7 +865,10 @@
 <!-- CHECKOUT MODAL -->
 <div class="modal-checkout-backdrop" id="checkoutModal">
   <div class="checkout-modal-card">
-    <h3 class="checkout-step-title">Datos para tu Pedido</h3>
+    <h3 class="checkout-step-title">Resumen de tu Pedido</h3>
+    
+    <div class="order-summary-box" id="modalOrderSummary"></div>
+
     <form id="checkoutForm">
       <div class="form-group">
         <label class="form-label">Nombre Completo</label>
@@ -921,8 +894,8 @@
         </select>
       </div>
       <div style="display:flex; gap:10px; margin-top:20px;">
-        <button type="button" class="nav-btn" style="flex:1; justify-content:center;" id="btnCancelCheckout">Cancelar</button>
-        <button type="submit" class="btn-checkout" style="flex:2;">Enviar WhatsApp</button>
+        <button type="button" class="nav-btn" style="flex:1; justify-content:center;" id="btnCancelCheckout">Volver</button>
+        <button type="submit" class="btn-checkout" style="flex:2;">Confirmar Pedido</button>
       </div>
     </form>
   </div>
@@ -943,7 +916,6 @@
 
   const $ = id => document.getElementById(id);
 
-  // Google Drive Parser
   function parseImageUrl(url) {
     if (!url) return "";
     let fileId = "";
@@ -956,7 +928,6 @@
     return fileId ? `https://lh3.googleusercontent.com/d/${fileId}` : url;
   }
 
-  // Dynamic Time Greeting
   function initGreeting() {
     const hour = new Date().getHours();
     let text = "¡Buenos días!";
@@ -991,7 +962,7 @@
             category: String(getV(1)).trim() || "General",
             price: parseFloat(getV(2)) || 0,
             image: parseImageUrl(String(getV(3)).trim()),
-            isPromo: i % 4 === 0 // Dynamic Badge mockup
+            isPromo: i % 4 === 0
           };
         }).filter(Boolean);
       }
@@ -1086,6 +1057,7 @@
     let totalItems = 0;
     let totalPrice = 0;
     const items = [];
+    const summaryItems = [];
 
     Object.keys(cart).forEach(id => {
       const p = products.find(prod => prod.id === id);
@@ -1107,6 +1079,13 @@
             </div>
           </div>
         `);
+
+        summaryItems.push(`
+          <div class="order-summary-item">
+            <span>${q}x ${p.name}</span>
+            <span style="font-weight:700;">${fmt(p.price * q)}</span>
+          </div>
+        `);
       }
     });
 
@@ -1115,7 +1094,18 @@
     $("drawerTotal").textContent = fmt(totalPrice);
     $("cartDrawerItems").innerHTML = items.length ? items.join("") : `<div style="text-align:center; padding:40px 0; color:var(--ink-muted);">Tu carrito está vacío</div>`;
 
-    // Progress bar mock
+    if (summaryItems.length) {
+      summaryItems.push(`
+        <div class="order-summary-item" style="border-top:1px dashed var(--border-light); padding-top:8px; margin-top:8px; font-weight:800; font-size:1rem;">
+          <span>Total Estimado</span>
+          <span style="color:var(--emerald-accent);">${fmt(totalPrice)}</span>
+        </div>
+      `);
+      $("modalOrderSummary").innerHTML = summaryItems.join("");
+    } else {
+      $("modalOrderSummary").innerHTML = `<p style="text-align:center; color:var(--ink-muted);">No hay productos seleccionados.</p>`;
+    }
+
     const target = 15000;
     const pct = Math.min(100, (totalPrice / target) * 100);
     $("shippingProgress").style.width = `${pct}%`;
@@ -1128,7 +1118,6 @@
     updateCartDrawerUI();
   }
 
-  // Events & Drawers
   $("btnOpenCart").onclick = () => $("drawerOverlay").classList.add("active");
   $("btnMobCart").onclick = () => $("drawerOverlay").classList.add("active");
   $("btnCloseDrawer").onclick = () => $("drawerOverlay").classList.remove("active");
@@ -1137,6 +1126,7 @@
   $("searchInput").oninput = (e) => { searchQuery = e.target.value; renderProducts(); };
 
   $("btnStartCheckout").onclick = () => {
+    if (Object.keys(cart).length === 0) return;
     $("drawerOverlay").classList.remove("active");
     $("checkoutModal").classList.add("active");
   };
@@ -1145,27 +1135,11 @@
 
   $("checkoutForm").onsubmit = (e) => {
     e.preventDefault();
-    const name = $("custName").value;
-    const del = $("custDelivery").value;
-    const addr = $("custAddress").value;
-    const pay = $("custPayment").value;
-
-    let msg = `*NUEVO PEDIDO - SUPERMERCADO CHILLAR*\n\n`;
-    msg += `*Cliente:* ${name}\n*Entrega:* ${del} (${addr})\n*Pago:* ${pay}\n\n*Detalle del pedido:*\n`;
-
-    let total = 0;
-    Object.keys(cart).forEach(id => {
-      const p = products.find(prod => prod.id === id);
-      if (p) {
-        msg += `- ${cart[id]}x ${p.name} (${fmt(p.price * cart[id])})\n`;
-        total += p.price * cart[id];
-      }
-    });
-
-    msg += `\n*TOTAL ESTIMADO:* ${fmt(total)}`;
-
-    const waUrl = `https://wa.me/?text=${encodeURIComponent(msg)}`;
-    window.open(waUrl, "_blank");
+    alert("¡Pedido registrado con éxito! Muchas gracias por tu compra.");
+    cart = {};
+    localStorage.removeItem("chillar_cart_v2");
+    $("checkoutModal").classList.remove("active");
+    renderUI();
   };
 
   initGreeting();
