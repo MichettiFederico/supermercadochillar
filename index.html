@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-<title>Supermercado Chillar — Experiencia Digital Premium</title>
+<title>Supermercado Chillar — Catálogo y Lista de Compras</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&family=Space+Grotesk:wght@600;700&display=swap" rel="stylesheet">
@@ -19,9 +19,6 @@
     --pine-100: #e6f4ed;
     --emerald-accent: #059669;
     --coral-main: #e11d48;
-    --coral-soft: #fff1f2;
-    --amber-main: #d97706;
-    --amber-soft: #fef3c7;
     --ink-main: #0f172a;
     --ink-muted: #64748b;
     --ink-light: #94a3b8;
@@ -100,7 +97,7 @@
 
   .logo-text span { color: var(--emerald-accent); }
 
-  /* SEARCH BAR MAIN */
+  /* SEARCH BAR */
   .search-wrapper {
     flex: 1;
     max-width: 540px;
@@ -182,7 +179,7 @@
     border-radius: var(--radius-full);
   }
 
-  /* HERO CONTEXTUAL */
+  /* HERO BANNER */
   .hero-banner {
     max-width: 1240px;
     margin: 20px auto 0;
@@ -432,9 +429,7 @@
     overflow: hidden;
   }
 
-  .price-wrapper {
-    margin-bottom: 14px;
-  }
+  .price-wrapper { margin-bottom: 14px; }
 
   .price-main {
     font-family: 'Space Grotesk', sans-serif;
@@ -450,9 +445,7 @@
     margin-top: 4px;
   }
 
-  .action-container {
-    margin-top: auto;
-  }
+  .action-container { margin-top: auto; }
 
   .btn-add-primary {
     width: 100%;
@@ -505,12 +498,9 @@
 
   .btn-qty-step:hover { background: rgba(255, 255, 255, 0.3); }
 
-  .qty-num {
-    font-weight: 700;
-    font-size: 0.95rem;
-  }
+  .qty-num { font-weight: 700; font-size: 0.95rem; }
 
-  /* SLIDE-OVER CART DRAWER */
+  /* SLIDE-OVER DRAWER (LISTA DE COMPRAS) */
   .drawer-overlay {
     position: fixed;
     inset: 0;
@@ -567,27 +557,14 @@
     font-weight: 700;
   }
 
-  .free-shipping-bar {
+  .drawer-info-note {
     background: var(--pine-100);
     padding: 12px 24px;
     font-size: 0.82rem;
     color: var(--pine-800);
     font-weight: 600;
-  }
-
-  .progress-bg {
-    height: 6px;
-    background: rgba(16, 185, 129, 0.2);
-    border-radius: var(--radius-full);
-    margin-top: 6px;
-    overflow: hidden;
-  }
-
-  .progress-fill {
-    height: 100%;
-    background: var(--pine-500);
-    width: 0%;
-    transition: width 0.3s ease;
+    text-align: center;
+    border-bottom: 1px solid var(--border-light);
   }
 
   .drawer-body {
@@ -626,27 +603,9 @@
     display: flex;
     justify-content: space-between;
     align-items: center;
-    margin-bottom: 16px;
     font-size: 1.1rem;
     font-weight: 700;
   }
-
-  .btn-checkout {
-    width: 100%;
-    background: var(--pine-900);
-    color: #fff;
-    border: none;
-    padding: 16px;
-    border-radius: var(--radius-full);
-    font-family: inherit;
-    font-size: 1rem;
-    font-weight: 700;
-    cursor: pointer;
-    transition: var(--transition-fast);
-    box-shadow: 0 4px 15px rgba(15,41,30,0.2);
-  }
-
-  .btn-checkout:hover { background: var(--pine-800); transform: translateY(-1px); }
 
   /* MOBILE BOTTOM NAV */
   .mobile-bottom-nav {
@@ -679,82 +638,6 @@
 
   .mob-nav-item.active { color: var(--pine-900); }
 
-  /* CHECKOUT MODAL FLOW */
-  .modal-checkout-backdrop {
-    position: fixed;
-    inset: 0;
-    background: rgba(15, 23, 42, 0.7);
-    backdrop-filter: blur(6px);
-    z-index: 300;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    padding: 20px;
-    opacity: 0;
-    pointer-events: none;
-    transition: opacity 0.25s ease;
-  }
-
-  .modal-checkout-backdrop.active { opacity: 1; pointer-events: auto; }
-
-  .checkout-modal-card {
-    background: var(--surface);
-    border-radius: var(--radius-xl);
-    width: 100%;
-    max-width: 520px;
-    max-height: 90vh;
-    overflow-y: auto;
-    padding: 28px;
-    box-shadow: var(--shadow-float);
-  }
-
-  .checkout-step-title {
-    font-family: 'Space Grotesk', sans-serif;
-    font-size: 1.3rem;
-    font-weight: 700;
-    margin-bottom: 16px;
-  }
-
-  .form-group {
-    margin-bottom: 14px;
-  }
-
-  .form-label {
-    display: block;
-    font-size: 0.82rem;
-    font-weight: 700;
-    margin-bottom: 6px;
-    color: var(--ink-main);
-  }
-
-  .form-input {
-    width: 100%;
-    padding: 12px 16px;
-    border-radius: var(--radius-md);
-    border: 1.5px solid var(--border-light);
-    font-family: inherit;
-    font-size: 0.9rem;
-    outline: none;
-  }
-
-  .form-input:focus { border-color: var(--pine-500); }
-
-  .order-summary-box {
-    background: var(--surface-subtle);
-    border-radius: var(--radius-md);
-    padding: 14px;
-    margin-bottom: 16px;
-    font-size: 0.85rem;
-  }
-
-  .order-summary-item {
-    display: flex;
-    justify-content: space-between;
-    margin-bottom: 6px;
-  }
-
-  .order-summary-item:last-child { margin-bottom: 0; }
-
   @media (max-width: 768px) {
     .nav-actions { display: none; }
     .hero-card { padding: 24px 20px; }
@@ -786,28 +669,28 @@
       </button>
       <button class="nav-btn cart-btn-desktop" id="btnOpenCart">
         <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="8" cy="21" r="1"/><circle cx="19" cy="21" r="1"/><path d="M2.05 2.05h2l2.66 12.42a2 2 0 0 0 2 1.58h9.78a2 2 0 0 0 1.95-1.57l1.65-7.43H5.12"/></svg>
-        <span>Mi Carrito</span>
+        <span>Mi Lista</span>
         <span class="cart-count-pill" id="cartBadgeDesktop">0</span>
       </button>
     </div>
   </div>
 </header>
 
-<!-- HERO CONTEXTUAL -->
+<!-- HERO -->
 <div class="hero-banner">
   <div class="hero-card">
     <div class="hero-greeting-badge" id="greetingBadge">
       <span>✨</span> ¡Buenos días!
     </div>
     <h1 class="hero-title" id="heroGreetingTitle">Lo mejor para tu mesa,<br>fresco y al instante.</h1>
-    <p class="hero-subtitle">Precios de góndola actualizados en vivo. Armá tu lista de compras y retirá por el local.</p>
+    <p class="hero-subtitle">Precios de góndola actualizados en vivo. Armá tu lista de compras para llevar al local.</p>
   </div>
 </div>
 
 <!-- MAIN LAYOUT -->
 <main class="app-layout">
 
-  <!-- CATEGORÍAS SCOLLABLE -->
+  <!-- CATEGORÍAS -->
   <div class="section-header">
     <div class="section-title-group">
       <h2 class="section-title">Categorías</h2>
@@ -816,7 +699,7 @@
   </div>
   <div class="categories-scroll" id="categoriesContainer"></div>
 
-  <!-- SECCIÓN PRODUCTOS DESTACADOS / GRID -->
+  <!-- PRODUCTOS -->
   <div class="section-header">
     <div class="section-title-group">
       <h2 class="section-title" id="gridTitle">Elegidos para vos</h2>
@@ -836,20 +719,19 @@
   </button>
   <button class="mob-nav-item" id="btnMobCart">
     <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="8" cy="21" r="1"/><circle cx="19" cy="21" r="1"/><path d="M2.05 2.05h2l2.66 12.42a2 2 0 0 0 2 1.58h9.78a2 2 0 0 0 1.95-1.57l1.65-7.43H5.12"/></svg>
-    Carrito (<span id="cartBadgeMobile">0</span>)
+    Mi Lista (<span id="cartBadgeMobile">0</span>)
   </button>
 </nav>
 
-<!-- CART SLIDE DRAWER -->
+<!-- SLIDE DRAWER (LISTA DE COMPRAS) -->
 <div class="drawer-overlay" id="drawerOverlay">
   <div class="cart-drawer">
     <div class="drawer-header">
-      <div class="drawer-title">Tu Compra</div>
+      <div class="drawer-title">📝 Mi Lista de Compras</div>
       <button class="btn-close-drawer" id="btnCloseDrawer">✕</button>
     </div>
-    <div class="free-shipping-bar">
-      <div id="shippingText">Agregá $15.000 más para un Descuento Especial</div>
-      <div class="progress-bg"><div class="progress-fill" id="shippingProgress"></div></div>
+    <div class="drawer-info-note">
+      Recordatorio para tu compra presencial en el local.
     </div>
     <div class="drawer-body" id="cartDrawerItems"></div>
     <div class="drawer-footer">
@@ -857,40 +739,7 @@
         <span>Total estimado</span>
         <span id="drawerTotal" style="color:var(--emerald-accent); font-family:'Space Grotesk'; font-size:1.4rem;">$0</span>
       </div>
-      <button class="btn-checkout" id="btnStartCheckout">Finalizar Pedido ➔</button>
     </div>
-  </div>
-</div>
-
-<!-- CHECKOUT MODAL -->
-<div class="modal-checkout-backdrop" id="checkoutModal">
-  <div class="checkout-modal-card">
-    <h3 class="checkout-step-title">Resumen de tu Pedido</h3>
-    
-    <div class="order-summary-box" id="modalOrderSummary"></div>
-
-    <form id="checkoutForm">
-      <div class="form-group">
-        <label class="form-label">Nombre Completo</label>
-        <input type="text" id="custName" class="form-input" placeholder="Ej. Juan Pérez" required>
-      </div>
-      <div class="form-group">
-        <label class="form-label">Modalidad de Entrega</label>
-        <input type="text" class="form-input" value="Retiro exclusivo en el local (Supermercado Chillar)" readonly style="background: var(--surface-subtle); color: var(--ink-muted); font-weight: 600; cursor: not-allowed;">
-      </div>
-      <div class="form-group">
-        <label class="form-label">Método de Pago Preferido en Caja</label>
-        <select id="custPayment" class="form-input">
-          <option value="Efectivo en Entrega">Efectivo</option>
-          <option value="Transferencia / Mercado Pago">Transferencia / Mercado Pago</option>
-          <option value="Tarjeta en el Local">Tarjeta de Débito / Crédito</option>
-        </select>
-      </div>
-      <div style="display:flex; gap:10px; margin-top:20px;">
-        <button type="button" class="nav-btn" style="flex:1; justify-content:center;" id="btnCancelCheckout">Volver</button>
-        <button type="submit" class="btn-checkout" style="flex:2;">Confirmar Pedido</button>
-      </div>
-    </form>
   </div>
 </div>
 
@@ -927,10 +776,10 @@
     let title = "Lo mejor para tu mesa,<br>fresco y al instante.";
     if (hour >= 12 && hour < 20) {
       text = "¡Buenas tardes! 🌆";
-      title = "Hacé tu compra rápida<br>para el resto del día.";
+      title = "Hacé tu lista rápido<br>para venir a comprar.";
     } else if (hour >= 20 || hour < 6) {
       text = "¡Buenas noches! 🌙";
-      title = "Dejá tu lista lista<br>para primera hora.";
+      title = "Armá tu lista hoy<br>para primera hora.";
     }
     $("greetingBadge").innerHTML = `<span>✨</span> ${text}`;
     $("heroGreetingTitle").innerHTML = title;
@@ -950,7 +799,6 @@
           const name = String(getV(0)).trim();
           if (!name || (i === 0 && name.toLowerCase().includes("nombre"))) return null;
 
-          // Columna E (index 4) para ofertas (ej: "si", "sí", "yes")
           const promoRaw = String(getV(4)).trim().toLowerCase();
           const isPromo = promoRaw === "si" || promoRaw === "sí" || promoRaw === "yes";
 
@@ -1022,7 +870,7 @@
           <div class="action-container">
             ${qty === 0 ? `
               <button class="btn-add-primary" onclick="window.updateQty('${p.id}', 1)">
-                <span>＋</span> Agregar
+                <span>＋</span> Anotar
               </button>
             ` : `
               <div class="qty-toggle-box">
@@ -1055,7 +903,6 @@
     let totalItems = 0;
     let totalPrice = 0;
     const items = [];
-    const summaryItems = [];
 
     Object.keys(cart).forEach(id => {
       const p = products.find(prod => prod.id === id);
@@ -1077,37 +924,13 @@
             </div>
           </div>
         `);
-
-        summaryItems.push(`
-          <div class="order-summary-item">
-            <span>${q}x ${p.name}</span>
-            <span style="font-weight:700;">${fmt(p.price * q)}</span>
-          </div>
-        `);
       }
     });
 
     $("cartBadgeDesktop").textContent = totalItems;
     $("cartBadgeMobile").textContent = totalItems;
     $("drawerTotal").textContent = fmt(totalPrice);
-    $("cartDrawerItems").innerHTML = items.length ? items.join("") : `<div style="text-align:center; padding:40px 0; color:var(--ink-muted);">Tu carrito está vacío</div>`;
-
-    if (summaryItems.length) {
-      summaryItems.push(`
-        <div class="order-summary-item" style="border-top:1px dashed var(--border-light); padding-top:8px; margin-top:8px; font-weight:800; font-size:1rem;">
-          <span>Total Estimado</span>
-          <span style="color:var(--emerald-accent);">${fmt(totalPrice)}</span>
-        </div>
-      `);
-      $("modalOrderSummary").innerHTML = summaryItems.join("");
-    } else {
-      $("modalOrderSummary").innerHTML = `<p style="text-align:center; color:var(--ink-muted);">No hay productos seleccionados.</p>`;
-    }
-
-    const target = 15000;
-    const pct = Math.min(100, (totalPrice / target) * 100);
-    $("shippingProgress").style.width = `${pct}%`;
-    $("shippingText").textContent = pct >= 100 ? "¡Beneficio Especial alcanzado!" : `Agregá ${fmt(target - totalPrice)} más para Descuento Especial`;
+    $("cartDrawerItems").innerHTML = items.length ? items.join("") : `<div style="text-align:center; padding:40px 0; color:var(--ink-muted);">Tu lista está vacía</div>`;
   }
 
   function renderUI() {
@@ -1122,23 +945,6 @@
   $("drawerOverlay").onclick = (e) => { if (e.target === $("drawerOverlay")) $("drawerOverlay").classList.remove("active"); };
 
   $("searchInput").oninput = (e) => { searchQuery = e.target.value; renderProducts(); };
-
-  $("btnStartCheckout").onclick = () => {
-    if (Object.keys(cart).length === 0) return;
-    $("drawerOverlay").classList.remove("active");
-    $("checkoutModal").classList.add("active");
-  };
-
-  $("btnCancelCheckout").onclick = () => $("checkoutModal").classList.remove("active");
-
-  $("checkoutForm").onsubmit = (e) => {
-    e.preventDefault();
-    alert("¡Pedido registrado con éxito! Tu orden quedó lista para retirar en el local.");
-    cart = {};
-    localStorage.removeItem("chillar_cart_v2");
-    $("checkoutModal").classList.remove("active");
-    renderUI();
-  };
 
   initGreeting();
   fetchCatalog();
