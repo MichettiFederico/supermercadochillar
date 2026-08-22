@@ -1,0 +1,310 @@
+<!DOCTYPE html>
+<html lang="es-AR">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Admin — Supermercado Chillar</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700&family=Space+Grotesk:wght@600;700&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --bg: #f8f6f0; --surface: #ffffff; --pine: #1b382b; --pine-light: #2a5240;
+    --brick: #c84327; --ink: #1c1917; --ink-muted: #78716c; --border: #e7e5e4;
+    --radius: 12px;
+  }
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  body { background: var(--bg); color: var(--ink); font-family: 'Plus Jakarta Sans', sans-serif; padding: 20px; }
+  .container { max-width: 900px; margin: 0 auto; }
+  
+  header { margin-bottom: 24px; display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 12px; }
+  h1 { font-family: 'Space Grotesk', sans-serif; font-size: 1.8rem; color: var(--pine); }
+
+  .card { background: var(--surface); padding: 20px; border-radius: var(--radius); border: 1px solid var(--border); margin-bottom: 20px; box-shadow: 0 2px 4px rgba(0,0,0,0.04); }
+  .card h2 { font-size: 1.1rem; margin-bottom: 14px; color: var(--pine); display: flex; justify-content: space-between; align-items: center; }
+
+  .grid-2 { display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 12px; }
+  .form-group { display: flex; flex-direction: column; gap: 4px; margin-bottom: 12px; }
+  label { font-size: 0.8rem; font-weight: 600; color: var(--ink-muted); }
+  input, select { padding: 10px 12px; border-radius: 8px; border: 1px solid var(--border); font-family: inherit; font-size: 0.9rem; outline: none; }
+  input:focus { border-color: var(--pine); }
+
+  .btn { background: var(--pine); color: #fff; border: none; padding: 10px 18px; border-radius: 8px; font-weight: 600; font-size: 0.88rem; cursor: pointer; transition: 0.2s; }
+  .btn:hover { background: var(--pine-light); }
+  .btn-brick { background: var(--brick); }
+  .btn-brick:hover { background: #a3321b; }
+  .btn-outline { background: transparent; border: 1px solid var(--border); color: var(--ink); }
+  .btn-outline:hover { background: var(--bg); }
+  .actions-row { display: flex; gap: 10px; flex-wrap: wrap; margin-top: 10px; }
+
+  table { width: 100%; border-collapse: collapse; margin-top: 10px; font-size: 0.9rem; }
+  th, td { text-align: left; padding: 10px; border-bottom: 1px solid var(--border); }
+  th { font-size: 0.78rem; text-transform: uppercase; color: var(--ink-muted); }
+  .img-thumb { width: 40px; height: 40px; border-radius: 6px; object-fit: cover; background: #eee; }
+
+  .badge { background: #e0f2fe; color: #0369a1; padding: 2px 8px; border-radius: 4px; font-size: 0.75rem; font-weight: 600; }
+  
+  .status-msg { padding: 10px; border-radius: 8px; font-size: 0.85rem; margin-top: 10px; display: none; }
+  .status-msg.success { background: #dcfce7; color: #15803d; }
+  .status-msg.error { background: #fee2e2; color: #b91c1c; }
+</style>
+</head>
+<body>
+
+<div class="container">
+  <header>
+    <h1>⚙️ Administrador de Precios</h1>
+    <a href="index.html" class="btn btn-outline" target="_blank">Ver Tienda ↗</a>
+  </header>
+
+  <!-- Configuración GitHub -->
+  <div class="card">
+    <h2>1. Datos de Conexión (GitHub)</h2>
+    <div class="grid-2">
+      <div class="form-group"><label>Usuario de GitHub</label><input type="text" id="ghOwner" placeholder="MichettiFederico"></div>
+      <div class="form-group"><label>Repositorio</label><input type="text" id="ghRepo" placeholder="supermercadochillar"></div>
+      <div class="form-group"><label>Rama (Branch)</label><input type="text" id="ghBranch" value="main"></div>
+      <div class="form-group">
+        <label>Personal Access Token (Opcional para guardado directo)</label>
+        <input type="password" id="ghToken" placeholder="ghp_xxxxxxxxxxxx">
+      </div>
+    </div>
+    <div class="actions-row">
+      <button class="btn" id="btnLoad">📥 Cargar productos desde GitHub</button>
+      <button class="btn btn-brick" id="btnSaveGithub">🚀 Guardar Cambios en GitHub</button>
+      <button class="btn btn-outline" id="btnDownload">💾 Descargar productos.json</button>
+    </div>
+    <div id="statusMsg" class="status-msg"></div>
+  </div>
+
+  <!-- Formulario Producto -->
+  <div class="card">
+    <h2 id="formTitle">2. Agregar Nuevo Producto</h2>
+    <input type="hidden" id="editIndex" value="-1">
+    <div class="grid-2">
+      <div class="form-group"><label>Nombre del Producto</label><input type="text" id="pName" placeholder="Ej: Aceite de Girasol 1.5L"></div>
+      <div class="form-group"><label>Categoría</label><input type="text" id="pCategory" placeholder="Ej: Almacén, Bebidas, Lácteos"></div>
+      <div class="form-group"><label>Precio ($)</label><input type="number" id="pPrice" placeholder="Ej: 1800"></div>
+      <div class="form-group"><label>URL de Imagen (Opcional)</label><input type="text" id="pImage" placeholder="https://..."></div>
+    </div>
+    <div class="actions-row">
+      <button class="btn" id="btnSaveProduct">➕ Guardar Producto en la Lista</button>
+      <button class="btn btn-outline" id="btnCancelEdit" style="display:none;">Cancelar Edición</button>
+    </div>
+  </div>
+
+  <!-- Tabla de Productos -->
+  <div class="card">
+    <h2>3. Catálogo Actual (<span id="totalProducts">0</span>)</h2>
+    <input type="text" id="tableSearch" placeholder="Filtrar por nombre o categoría..." style="width:100%; margin-bottom:12px;">
+    <table id="productsTable">
+      <thead>
+        <tr>
+          <th>Foto</th>
+          <th>Nombre</th>
+          <th>Categoría</th>
+          <th>Precio</th>
+          <th>Acciones</th>
+        </tr>
+      </thead>
+      <tbody id="tableBody"></tbody>
+    </table>
+  </div>
+</div>
+
+<script>
+(function(){
+  "use strict";
+
+  let products = [];
+  const $ = id => document.getElementById(id);
+
+  // Cargar configuración guardada localmente
+  $("ghOwner").value = localStorage.getItem("cfg_owner") || "MichettiFederico";
+  $("ghRepo").value = localStorage.getItem("cfg_repo") || "supermercadochillar";
+  $("ghBranch").value = localStorage.getItem("cfg_branch") || "main";
+  $("ghToken").value = localStorage.getItem("cfg_token") || "";
+
+  function saveConfig(){
+    localStorage.setItem("cfg_owner", $("ghOwner").value.trim());
+    localStorage.setItem("cfg_repo", $("ghRepo").value.trim());
+    localStorage.setItem("cfg_branch", $("ghBranch").value.trim());
+    localStorage.setItem("cfg_token", $("ghToken").value.trim());
+  }
+
+  function showStatus(msg, isError = false){
+    const el = $("statusMsg");
+    el.textContent = msg;
+    el.className = `status-msg ${isError ? 'error' : 'success'}`;
+    el.style.display = 'block';
+    setTimeout(() => { el.style.display = 'none'; }, 5000);
+  }
+
+  // Cargar JSON desde GitHub
+  async function loadFromGithub(){
+    saveConfig();
+    const owner = $("ghOwner").value.trim();
+    const repo = $("ghRepo").value.trim();
+    const branch = $("ghBranch").value.trim();
+
+    try {
+      const res = await fetch(`https://raw.githubusercontent.com/${owner}/${repo}/${branch}/productos.json?t=${Date.now()}`);
+      if(res.ok){
+        products = await res.json();
+        renderTable();
+        showStatus("¡Productos cargados correctamente!");
+      } else {
+        showStatus("No se encontró productos.json. Empezá a agregar uno nuevo.", true);
+      }
+    } catch(e) {
+      showStatus("Error al conectar con GitHub.", true);
+    }
+  }
+
+  // Renderizar Tabla
+  function renderTable(){
+    const query = $("tableSearch").value.toLowerCase();
+    const filtered = products.filter(p => 
+      (p.name || '').toLowerCase().includes(query) || 
+      (p.category || '').toLowerCase().includes(query)
+    );
+
+    $("totalProducts").textContent = products.length;
+    $("tableBody").innerHTML = filtered.map((p, idx) => {
+      const realIdx = products.indexOf(p);
+      return `
+        <tr>
+          <td>${p.image ? `<img src="${p.image}" class="img-thumb">` : '<span style="color:#aaa;">Sin foto</span>'}</td>
+          <td><strong>${p.name}</strong></td>
+          <td><span class="badge">${p.category || 'General'}</span></td>
+          <td>$${p.price || 0}</td>
+          <td>
+            <button class="btn btn-outline" onclick="window.editProduct(${realIdx})">✏️</button>
+            <button class="btn btn-brick" onclick="window.deleteProduct(${realIdx})">🗑️</button>
+          </td>
+        </tr>
+      `;
+    }).join("");
+  }
+
+  // Agregar / Guardar Producto
+  $("btnSaveProduct").addEventListener("click", () => {
+    const name = $("pName").value.trim();
+    const category = $("pCategory").value.trim();
+    const price = parseFloat($("pPrice").value) || 0;
+    const image = $("pImage").value.trim();
+    const editIdx = parseInt($("editIndex").value);
+
+    if(!name){ alert("Ingresá un nombre al producto"); return; }
+
+    const item = { id: name.toLowerCase().replace(/\s+/g, '-'), name, category, price, image };
+
+    if(editIdx >= 0){
+      products[editIdx] = item;
+      $("editIndex").value = "-1";
+      $("formTitle").textContent = "2. Agregar Nuevo Producto";
+      $("btnCancelEdit").style.display = "none";
+    } else {
+      products.push(item);
+    }
+
+    // Limpiar campos
+    $("pName").value = ""; $("pCategory").value = ""; $("pPrice").value = ""; $("pImage").value = "";
+    renderTable();
+  });
+
+  window.editProduct = (idx) => {
+    const p = products[idx];
+    $("pName").value = p.name || "";
+    $("pCategory").value = p.category || "";
+    $("pPrice").value = p.price || "";
+    $("pImage").value = p.image || "";
+    $("editIndex").value = idx;
+    $("formTitle").textContent = "✏️ Editando Producto #" + (idx + 1);
+    $("btnCancelEdit").style.display = "inline-block";
+  };
+
+  window.deleteProduct = (idx) => {
+    if(confirm(`¿Borrar "${products[idx].name}"?`)){
+      products.splice(idx, 1);
+      renderTable();
+    }
+  };
+
+  $("btnCancelEdit").addEventListener("click", () => {
+    $("editIndex").value = "-1";
+    $("formTitle").textContent = "2. Agregar Nuevo Producto";
+    $("pName").value = ""; $("pCategory").value = ""; $("pPrice").value = ""; $("pImage").value = "";
+    $("btnCancelEdit").style.display = "none";
+  });
+
+  $("tableSearch").addEventListener("input", renderTable);
+
+  // Descargar archivo .json
+  $("btnDownload").addEventListener("click", () => {
+    const blob = new Blob([JSON.stringify(products, null, 2)], { type: "application/json" });
+    const a = document.createElement("a");
+    a.href = URL.createObjectURL(blob);
+    a.download = "productos.json";
+    a.click();
+  });
+
+  // Guardar directo en GitHub vía API
+  $("btnSaveGithub").addEventListener("click", async () => {
+    saveConfig();
+    const owner = $("ghOwner").value.trim();
+    const repo = $("ghRepo").value.trim();
+    const branch = $("ghBranch").value.trim();
+    const token = $("ghToken").value.trim();
+
+    if(!token){
+      alert("Para guardar directo necesitás ingresar un Personal Access Token de GitHub. De lo contrario, usá el botón 'Descargar productos.json' y reemplazalo manualmente.");
+      return;
+    }
+
+    showStatus("Guardando en GitHub...");
+
+    try {
+      // 1. Obtener el SHA del archivo actual si existe
+      let sha = "";
+      const getRes = await fetch(`https://api.github.com/repos/${owner}/${repo}/contents/productos.json?ref=${branch}`, {
+        headers: { "Authorization": `token ${token}` }
+      });
+      if(getRes.ok){
+        const data = await getRes.json();
+        sha = data.sha;
+      }
+
+      // 2. Subir nueva versión
+      const contentBase64 = btoa(unescape(encodeURIComponent(JSON.stringify(products, null, 2))));
+      const putRes = await fetch(`https://api.github.com/repos/${owner}/${repo}/contents/productos.json`, {
+        method: "PUT",
+        headers: {
+          "Authorization": `token ${token}`,
+          "Content-Type": "application/json"
+        },
+        body: JSON.stringify({
+          message: "Actualización de catálogo desde Panel de Admin",
+          content: contentBase64,
+          sha: sha || undefined,
+          branch: branch
+        })
+      });
+
+      if(putRes.ok){
+        showStatus("¡Catálogo publicado con éxito en GitHub!");
+      } else {
+        const err = await putRes.json();
+        showStatus("Error al guardar: " + (err.message || "Verificá el Token"), true);
+      }
+    } catch(e) {
+      showStatus("Ocurrió un problema de conexión", true);
+    }
+  });
+
+  $("btnLoad").addEventListener("click", loadFromGithub);
+  loadFromGithub();
+})();
+</script>
+</body>
+</html>
