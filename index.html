@@ -156,6 +156,7 @@
   }
 
   .nav-btn:hover { background: var(--pine-100); color: var(--pine-800); }
+  .nav-btn.active { background: var(--coral-main); color: #fff; }
 
   .cart-btn-desktop {
     background: var(--pine-900);
@@ -194,17 +195,6 @@
     position: relative;
     overflow: hidden;
     box-shadow: var(--shadow-card);
-  }
-
-  .hero-card::after {
-    content: "";
-    position: absolute;
-    right: -40px;
-    bottom: -40px;
-    width: 280px;
-    height: 280px;
-    background: radial-gradient(circle, rgba(16,185,129,0.25) 0%, rgba(0,0,0,0) 70%);
-    pointer-events: none;
   }
 
   .hero-greeting-badge {
@@ -755,6 +745,7 @@
   let favorites = JSON.parse(localStorage.getItem("chillar_favs") || "[]");
   let activeCategory = "Todos";
   let searchQuery = "";
+  let showingFavorites = false;
 
   const $ = id => document.getElementById(id);
 
@@ -843,10 +834,21 @@
     const filtered = products.filter(p => {
       const matchCat = activeCategory === "Todos" || p.category === activeCategory;
       const matchSearch = p.name.toLowerCase().includes(searchQuery.toLowerCase());
-      return matchCat && matchSearch;
+      const matchFav = !showingFavorites || favorites.includes(p.id);
+      return matchCat && matchSearch && matchFav;
     });
 
+    $("gridTitle").textContent = showingFavorites ? "Mis Favoritos ♥" : "Elegidos para vos";
     $("resultsCount").textContent = `${filtered.length} productos`;
+
+    if (filtered.length === 0) {
+      $("productsGrid").innerHTML = `
+        <div style="grid-column: 1/-1; text-align: center; padding: 40px 20px; color: var(--ink-muted);">
+          ${showingFavorites ? 'No tenés productos marcados como favoritos todavía.' : 'No se encontraron productos.'}
+        </div>
+      `;
+      return;
+    }
 
     $("productsGrid").innerHTML = filtered.map(p => {
       const qty = cart[p.id] || 0;
@@ -938,6 +940,12 @@
     renderProducts();
     updateCartDrawerUI();
   }
+
+  $("btnFavorites").onclick = () => {
+    showingFavorites = !showingFavorites;
+    $("btnFavorites").classList.toggle("active", showingFavorites);
+    renderProducts();
+  };
 
   $("btnOpenCart").onclick = () => $("drawerOverlay").classList.add("active");
   $("btnMobCart").onclick = () => $("drawerOverlay").classList.add("active");
